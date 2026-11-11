@@ -367,33 +367,107 @@ function updateSelectedDealer() {
   const d = dealers.find(x => x.id === $('visitDealer').value);
   $('selectedDealerInfo').textContent = d ? `${d.address}${currentPosition ? ' · ' + distanceKm(currentPosition, d).toFixed(2) + ' km away (straight-line distance)' : ''}` : 'Select a dealer to see its address and distance.'
 }
-$('visitPhoto').addEventListener('change', () => {
-  const file = $('visitPhoto').files?.[0];
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = null;
-  if (!file) {
-    $('photoPreview').classList.add('hidden');
-    return
+
+
+let cameraStream = null;
+let capturedPhotoFile = null;
+
+const cameraPreview = document.getElementById("cameraPreview");
+const cameraCanvas = document.getElementById("cameraCanvas");
+const photoPreview = document.getElementById("photoPreview");
+const cameraStatus = document.getElementById("cameraStatus");
+
+document.getElementById("startCamera").addEventListener("click", async () => {
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      throw new Error("Live camera is not supported. Open the app using HTTPS.");
+    }
+
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" }
+      },
+      audio: false
+    });
+
+    cameraPreview.srcObject = cameraStream;
+    cameraPreview.classList.remove("hidden");
+    photoPreview.classList.add("hidden");
+
+    document.getElementById("capturePhoto").disabled = false;
+    document.getElementById("retakePhoto").classList.add("hidden");
+
+    cameraStatus.textContent = "Camera is ready. Capture your visit photo.";
+  } catch (error) {
+    console.error(error);
+    cameraStatus.textContent = error.message || "Unable to access camera.";
   }
-  if (!file.type.startsWith('image/')) {
-    toast('Please capture an image.', true);
-    $('visitPhoto').value = '';
-    return
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    toast('Photo must be 10 MB or smaller.', true);
-    $('visitPhoto').value = '';
-    return
-  }
-  previewUrl = URL.createObjectURL(file);
-  $('photoPreview').src = previewUrl;
-  $('photoPreview').classList.remove('hidden')
 });
+
+document.getElementById("capturePhoto").addEventListener("click", () => {
+  if (!cameraStream) return;
+
+  const video = cameraPreview;
+
+  if (!video.videoWidth || !video.videoHeight) {
+    cameraStatus.textContent = "Camera is not ready yet.";
+    return;
+  }
+
+  cameraCanvas.width = video.videoWidth;
+  cameraCanvas.height = video.videoHeight;
+
+  const context = cameraCanvas.getContext("2d");
+  context.drawImage(video, 0, 0);
+
+  cameraCanvas.toBlob(blob => {
+    if (!blob) {
+      cameraStatus.textContent = "Could not capture photo.";
+      return;
+    }
+
+    capturedPhotoFile = new File(
+      [blob],
+      `visit-${Date.now()}.jpg`,
+      { type: "image/jpeg" }
+    );
+
+    photoPreview.src = URL.createObjectURL(capturedPhotoFile);
+    photoPreview.classList.remove("hidden");
+    cameraPreview.classList.add("hidden");
+
+    stopCamera();
+
+    document.getElementById("capturePhoto").disabled = true;
+    document.getElementById("retakePhoto").classList.remove("hidden");
+
+    cameraStatus.textContent = "Photo captured successfully.";
+  }, "image/jpeg", 0.90);
+});
+
+document.getElementById("retakePhoto").addEventListener("click", async () => {
+  capturedPhotoFile = null;
+  photoPreview.classList.add("hidden");
+  await openCameraAgain();
+});
+
+async function openCameraAgain() {
+  document.getElementById("startCamera").click();
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+}
+
+
 $('visitForm').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = $('submitVisitBtn');
   const dealer = dealers.find(d => d.id === $('visitDealer').value),
-    file = $('visitPhoto').files?.[0];
+  file = capturedPhotoFile;
   if (!dealer || !file) {
     toast('Select a dealer and take a photo first.', true);
     return
@@ -446,6 +520,10 @@ $('visitForm').addEventListener('submit', async e => {
   } finally {
     setLoading(btn, false)
   }
+  capturedPhotoFile = null;
+  photoPreview.removeAttribute("src");
+  photoPreview.classList.add("hidden");
+  cameraStatus.textContent = "Open the camera and capture a live photo.";
 });
 
 

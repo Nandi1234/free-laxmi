@@ -20,7 +20,8 @@
             required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password"
             required></label><button class="primary full" type="submit">Sign in</button></form>
       <p class="small muted">New setup? Create your first admin account in Firebase Authentication, then add a matching
-        <code>users/{'{uid}'}</code> Firestore document with role <code>admin</code>.</p>
+        <code>users/{'{uid}'}</code> Firestore document with role <code>admin</code>.
+      </p>
     </section>
   </main>
   <div id="appView" class="app-shell hidden">
@@ -188,9 +189,36 @@
                 </select></label>
               <div id="selectedDealerInfo" class="dealer-info muted">Select a dealer to see its address and distance.
               </div><label>Visit notes<textarea id="visitNotes" rows="3" maxlength="1000"
-                  placeholder="What happened during the visit?"></textarea></label><label>Camera photo <span
-                  class="required">*</span><input id="visitPhoto" type="file" accept="image/*" capture="environment"
-                  required></label>
+                  placeholder="What happened during the visit?"></textarea></label>
+
+              <div class="camera-section">
+                <label>Live camera photo <span class="required">*</span></label>
+
+                <video id="cameraPreview" autoplay playsinline class="photo-preview"></video>
+
+                <canvas id="cameraCanvas" hidden></canvas>
+
+                <img id="photoPreview" class="photo-preview hidden" alt="Captured visit photo">
+
+                <div class="camera-buttons">
+                  <button type="button" id="startCamera" class="secondary">
+                    Open camera
+                  </button>
+
+                  <button type="button" id="capturePhoto" class="primary" disabled>
+                    Capture photo
+                  </button>
+
+                  <button type="button" id="retakePhoto" class="secondary hidden">
+                    Retake photo
+                  </button>
+                </div>
+
+                <p id="cameraStatus" class="muted">
+                  Open the camera and capture a live photo.
+                </p>
+              </div>
+
               <div class="camera-note">▣ Camera capture is requested on supported mobile browsers. The app rejects
                 images without a camera-capture hint, but browsers cannot guarantee that every device will block gallery
                 selection.</div><img id="photoPreview" class="photo-preview hidden" alt="Visit photo preview"><button

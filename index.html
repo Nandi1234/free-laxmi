@@ -1,37 +1,216 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>FieldOps · Admin Panel</title><link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FieldOps · Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div id="toast" role="status" aria-live="polite"></div>
   <main id="authView" class="auth-wrap">
     <section class="auth-card">
-      <div class="brand-mark">FO</div><p class="eyebrow">FIELD TEAM MANAGEMENT</p><h1>Welcome back</h1><p class="muted">Sign in to your workspace.</p>
-      <form id="loginForm"><label>Email<input id="loginEmail" type="email" autocomplete="username" required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="primary full" type="submit">Sign in</button></form>
-      <p class="small muted">New setup? Create your first admin account in Firebase Authentication, then add a matching <code>users/{'{uid}'}</code> Firestore document with role <code>admin</code>.</p>
+      <div class="brand-mark">FO</div>
+      <p class="eyebrow">FIELD TEAM MANAGEMENT</p>
+      <h1>Welcome back</h1>
+      <p class="muted">Sign in to your workspace.</p>
+      <form id="loginForm"><label>Email<input id="loginEmail" type="email" autocomplete="username"
+            required></label><label>Password<input id="loginPassword" type="password" autocomplete="current-password"
+            required></label><button class="primary full" type="submit">Sign in</button></form>
+      <p class="small muted">New setup? Create your first admin account in Firebase Authentication, then add a matching
+        <code>users/{'{uid}'}</code> Firestore document with role <code>admin</code>.</p>
     </section>
   </main>
   <div id="appView" class="app-shell hidden">
-    <aside class="sidebar"><div class="brand"><span class="brand-mark small-mark">FO</span><span>FieldOps<small>WORKSPACE</small></span></div><div class="nav-label">WORKSPACE</div>
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark small-mark">FO</span><span>FieldOps<small>WORKSPACE</small></span>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
       <button class="nav active" data-page="overview">▦ <span>Overview</span></button>
       <button class="nav admin-only" data-page="employees">♙ <span>Employees</span></button>
       <button class="nav admin-only" data-page="dealers">⌖ <span>Dealers</span></button>
       <button class="nav" data-page="attendance">◷ <span>Attendance</span></button>
       <button class="nav" data-page="visits">☑ <span>Dealer visits</span></button>
-      <div class="sidebar-bottom"><div class="user-mini"><div class="avatar" id="userAvatar">U</div><div><strong id="userName">User</strong><small id="userRole">Employee</small></div></div><button id="logoutBtn" class="logout">↪ Sign out</button></div>
+      <div class="sidebar-bottom">
+        <div class="user-mini">
+          <div class="avatar" id="userAvatar">U</div>
+          <div><strong id="userName">User</strong><small id="userRole">Employee</small></div>
+        </div><button id="logoutBtn" class="logout">↪ Sign out</button>
+      </div>
     </aside>
-    <main class="main"><header class="topbar"><div><p class="eyebrow" id="pageEyebrow">WORKSPACE</p><h2 id="pageTitle">Overview</h2></div><div class="top-user"><span class="online-dot"></span><span id="topUserEmail">Signed in</span></div></header>
-      <section id="page-overview" class="page"><div class="welcome-row"><div><h3 id="welcomeTitle">Good to see you</h3><p class="muted">Here’s what’s happening with your field team.</p></div><span class="date-pill" id="todayLabel"></span></div>
-        <div class="stats-grid"><article class="stat-card"><span class="stat-icon purple">♙</span><p>Employees</p><strong id="statEmployees">—</strong><small>Team members</small></article><article class="stat-card"><span class="stat-icon blue">⌖</span><p>Dealers</p><strong id="statDealers">—</strong><small>Dealer locations</small></article><article class="stat-card"><span class="stat-icon green">◷</span><p>Checked in today</p><strong id="statAttendance">—</strong><small>Attendance records</small></article><article class="stat-card"><span class="stat-icon orange">☑</span><p>Visits today</p><strong id="statVisits">—</strong><small>Submitted visits</small></article></div>
-        <div class="content-card"><div class="section-head"><div><h3>Quick actions</h3><p class="muted">Jump straight into your daily work.</p></div></div><div class="quick-grid"><button class="quick-action admin-only" data-go="employees"><span>＋</span><b>Add employee</b><small>Create a team login</small></button><button class="quick-action admin-only" data-go="dealers"><span>⌖</span><b>Add dealer</b><small>Save dealer coordinates</small></button><button class="quick-action" data-go="attendance"><span>◷</span><b>Attendance</b><small>Check in or check out</small></button><button class="quick-action" data-go="visits"><span>☑</span><b>Record a visit</b><small>Photo evidence required</small></button></div></div>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="pageEyebrow">WORKSPACE</p>
+          <h2 id="pageTitle">Overview</h2>
+        </div>
+        <div class="top-user"><span class="online-dot"></span><span id="topUserEmail">Signed in</span></div>
+      </header>
+      <section id="page-overview" class="page">
+        <div class="welcome-row">
+          <div>
+            <h3 id="welcomeTitle">Good to see you</h3>
+            <p class="muted">Here’s what’s happening with your field team.</p>
+          </div><span class="date-pill" id="todayLabel"></span>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon purple">♙</span>
+            <p>Employees</p><strong id="statEmployees">—</strong><small>Team members</small>
+          </article>
+          <article class="stat-card"><span class="stat-icon blue">⌖</span>
+            <p>Dealers</p><strong id="statDealers">—</strong><small>Dealer locations</small>
+          </article>
+          <article class="stat-card"><span class="stat-icon green">◷</span>
+            <p>Checked in today</p><strong id="statAttendance">—</strong><small>Attendance records</small>
+          </article>
+          <article class="stat-card"><span class="stat-icon orange">☑</span>
+            <p>Visits today</p><strong id="statVisits">—</strong><small>Submitted visits</small>
+          </article>
+        </div>
+        <div class="content-card">
+          <div class="section-head">
+            <div>
+              <h3>Quick actions</h3>
+              <p class="muted">Jump straight into your daily work.</p>
+            </div>
+          </div>
+          <div class="quick-grid"><button class="quick-action admin-only" data-go="employees"><span>＋</span><b>Add
+                employee</b><small>Create a team login</small></button><button class="quick-action admin-only"
+              data-go="dealers"><span>⌖</span><b>Add dealer</b><small>Save dealer coordinates</small></button><button
+              class="quick-action" data-go="attendance"><span>◷</span><b>Attendance</b><small>Check in or check
+                out</small></button><button class="quick-action" data-go="visits"><span>☑</span><b>Record a
+                visit</b><small>Photo evidence required</small></button></div>
+        </div>
       </section>
-      <section id="page-employees" class="page hidden admin-only"><div class="two-col"><div class="content-card"><div class="section-head"><div><h3>Add employee</h3><p class="muted">Create a sign-in account for a team member.</p></div></div><form id="employeeForm" class="form-grid"><label>Full name<input id="empName" required maxlength="100" placeholder="e.g. Rahul Sharma"></label><label>Email address<input id="empEmail" type="email" required placeholder="name@company.com"></label><label>Temporary password<input id="empPassword" type="password" required minlength="6" placeholder="At least 6 characters"></label><label>Role<select id="empRole"><option value="employee">Employee</option><option value="admin">Admin</option></select></label><button class="primary" type="submit">＋ Create user</button></form><p class="small muted">The account is created using a secondary Firebase Auth session so your admin session stays signed in.</p></div><div class="content-card"><div class="section-head"><div><h3>Team directory</h3><p class="muted">Registered workspace users.</p></div><button class="secondary" id="refreshEmployees">Refresh</button></div><div id="employeeList" class="list-area"><p class="muted">Loading team…</p></div></div></div></section>
-      <section id="page-dealers" class="page hidden admin-only"><div class="two-col"><div class="content-card"><div class="section-head"><div><h3>Add dealer</h3><p class="muted">Store the dealer's address and map coordinates.</p></div></div><form id="dealerForm" class="form-grid"><label>Dealer name<input id="dealerName" required maxlength="150" placeholder="Dealer / business name"></label><label>Address<textarea id="dealerAddress" required rows="3" maxlength="500" placeholder="Full address"></textarea></label><div class="inline-fields"><label>Latitude<input id="dealerLat" type="number" step="any" min="-90" max="90" required placeholder="22.5726"></label><label>Longitude<input id="dealerLng" type="number" step="any" min="-180" max="180" required placeholder="88.3639"></label></div><button class="secondary" type="button" id="useDealerLocation">◎ Use my current location</button><button class="primary" type="submit">＋ Save dealer</button></form></div><div class="content-card"><div class="section-head"><div><h3>Dealer directory</h3><p class="muted">Locations available to employees.</p></div><input id="dealerSearch" class="search" placeholder="Search dealers…"></div><div id="dealerList" class="list-area"><p class="muted">Loading dealers…</p></div></div></div></section>
-      <section id="page-attendance" class="page hidden"><div class="two-col attendance-layout"><div class="content-card attendance-card"><div class="big-clock" id="liveClock">--:--:--</div><p class="muted" id="clockDate"></p><div class="attendance-status"><span class="status-dot"></span><span id="attendanceStatusText">Checking today's attendance…</span></div><div class="attendance-actions"><button id="checkInBtn" class="primary full">↘ Check in</button><button id="checkOutBtn" class="secondary full" disabled>↗ Check out</button></div><p class="small muted">Timestamps are recorded by Firestore server time. Location permission is requested when you check in/out.</p></div><div class="content-card"><div class="section-head"><div><h3>Attendance history</h3><p class="muted">Your recent attendance records.</p></div></div><div id="attendanceList" class="list-area"></div></div></div></section>
-      <section id="page-visits" class="page hidden"><div class="two-col"><div class="content-card"><div class="section-head"><div><h3>Record dealer visit</h3><p class="muted">Choose a nearby dealer and take a photo using your camera.</p></div></div><form id="visitForm" class="form-grid"><label>Find dealers near me<button type="button" id="locateDealers" class="secondary full">◎ Get my location & distances</button></label><label>Dealer<select id="visitDealer" required><option value="">Select a dealer…</option></select></label><div id="selectedDealerInfo" class="dealer-info muted">Select a dealer to see its address and distance.</div><label>Visit notes<textarea id="visitNotes" rows="3" maxlength="1000" placeholder="What happened during the visit?"></textarea></label><label>Camera photo <span class="required">*</span><input id="visitPhoto" type="file" accept="image/*" capture="environment" required></label><div class="camera-note">▣ Camera capture is requested on supported mobile browsers. The app rejects images without a camera-capture hint, but browsers cannot guarantee that every device will block gallery selection.</div><img id="photoPreview" class="photo-preview hidden" alt="Visit photo preview"><button class="primary" id="submitVisitBtn" type="submit">Submit visit</button></form></div><div class="content-card"><div class="section-head"><div><h3>Recent visits</h3><p class="muted">Visit log for your account.</p></div><button class="secondary" id="refreshVisits">Refresh</button></div><div id="visitList" class="list-area"></div></div></div></section>
+      <section id="page-employees" class="page hidden admin-only">
+        <div class="two-col">
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Add employee</h3>
+                <p class="muted">Create a sign-in account for a team member.</p>
+              </div>
+            </div>
+            <form id="employeeForm" class="form-grid"><label>Full name<input id="empName" required maxlength="100"
+                  placeholder="e.g. Rahul Sharma"></label><label>Email address<input id="empEmail" type="email" required
+                  placeholder="name@company.com"></label><label>Temporary password<input id="empPassword"
+                  type="password" required minlength="6" placeholder="At least 6 characters"></label><label>Role<select
+                  id="empRole">
+                  <option value="employee">Employee</option>
+                  <option value="admin">Admin</option>
+                </select></label><button class="primary" type="submit">＋ Create user</button></form>
+            <p class="small muted">The account is created using a secondary Firebase Auth session so your admin session
+              stays signed in.</p>
+          </div>
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Team directory</h3>
+                <p class="muted">Registered workspace users.</p>
+              </div><button class="secondary" id="refreshEmployees">Refresh</button>
+            </div>
+            <div id="employeeList" class="list-area">
+              <p class="muted">Loading team…</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="page-dealers" class="page hidden admin-only">
+        <div class="two-col">
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Add dealer</h3>
+                <p class="muted">Store the dealer's address and map coordinates.</p>
+              </div>
+            </div>
+            <form id="dealerForm" class="form-grid"><label>Dealer name<input id="dealerName" required maxlength="150"
+                  placeholder="Dealer / business name"></label><label>Address<textarea id="dealerAddress" required
+                  rows="3" maxlength="500" placeholder="Full address"></textarea></label>
+              <div class="inline-fields"><label>Latitude<input id="dealerLat" type="number" step="any" min="-90"
+                    max="90" required placeholder="22.5726"></label><label>Longitude<input id="dealerLng" type="number"
+                    step="any" min="-180" max="180" required placeholder="88.3639"></label></div><button
+                class="secondary" type="button" id="useDealerLocation">◎ Use my current location</button><button
+                class="primary" type="submit">＋ Save dealer</button>
+            </form>
+          </div>
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Dealer directory</h3>
+                <p class="muted">Locations available to employees.</p>
+              </div><input id="dealerSearch" class="search" placeholder="Search dealers…">
+            </div>
+            <div id="dealerList" class="list-area">
+              <p class="muted">Loading dealers…</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="page-attendance" class="page hidden">
+        <div class="two-col attendance-layout">
+          <div class="content-card attendance-card">
+            <div class="big-clock" id="liveClock">--:--:--</div>
+            <p class="muted" id="clockDate"></p>
+            <div class="attendance-status"><span class="status-dot"></span><span id="attendanceStatusText">Checking
+                today's attendance…</span></div>
+            <div class="attendance-actions"><button id="checkInBtn" class="primary full">↘ Check in</button><button
+                id="checkOutBtn" class="secondary full" disabled>↗ Check out</button></div>
+            <p class="small muted">Timestamps are recorded by Firestore server time. Location permission is requested
+              when you check in/out.</p>
+          </div>
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Attendance history</h3>
+                <p class="muted">Your recent attendance records.</p>
+              </div>
+            </div>
+            <div id="attendanceList" class="list-area"></div>
+          </div>
+        </div>
+      </section>
+      <section id="page-visits" class="page hidden">
+        <div class="two-col">
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Record dealer visit</h3>
+                <p class="muted">Choose a nearby dealer and take a photo using your camera.</p>
+              </div>
+            </div>
+            <form id="visitForm" class="form-grid"><label>Find dealers near me<button type="button" id="locateDealers"
+                  class="secondary full">◎ Get my location & distances</button></label><label>Dealer<select
+                  id="visitDealer" required>
+                  <option value="">Select a dealer…</option>
+                </select></label>
+              <div id="selectedDealerInfo" class="dealer-info muted">Select a dealer to see its address and distance.
+              </div><label>Visit notes<textarea id="visitNotes" rows="3" maxlength="1000"
+                  placeholder="What happened during the visit?"></textarea></label><label>Camera photo <span
+                  class="required">*</span><input id="visitPhoto" type="file" accept="image/*" capture="environment"
+                  required></label>
+              <div class="camera-note">▣ Camera capture is requested on supported mobile browsers. The app rejects
+                images without a camera-capture hint, but browsers cannot guarantee that every device will block gallery
+                selection.</div><img id="photoPreview" class="photo-preview hidden" alt="Visit photo preview"><button
+                class="primary" id="submitVisitBtn" type="submit">Submit visit</button>
+            </form>
+          </div>
+          <div class="content-card">
+            <div class="section-head">
+              <div>
+                <h3>Recent visits</h3>
+                <p class="muted">Visit log for your account.</p>
+              </div><button class="secondary" id="refreshVisits">Refresh</button>
+            </div>
+            <div id="visitList" class="list-area"></div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
   <script type="module" src="app.js"></script>
-</body></html>
+</body>
+
+</html>

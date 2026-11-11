@@ -407,17 +407,15 @@ $('visitForm').addEventListener('submit', async e => {
     } catch (err) {
       if (!pos) throw err
     }
-    const visitRef = doc(collection(db, 'visits')),
-      photoPath = `visit-photos/${currentUser.uid}/${visitRef.id}/${Date.now()}.jpg`,
-      photoRef = ref(storage, photoPath);
-    await uploadBytes(photoRef, file, {
-      contentType: file.type,
-      customMetadata: {
-        userId: currentUser.uid,
-        visitId: visitRef.id
-      }
-    });
-    const photoUrl = await getDownloadURL(photoRef);
+    const visitRef = doc(collection(db, 'visits'));
+    const uploadedPhoto = await uploadToCloudinary(
+      file,
+      currentUser.uid,
+      visitRef.id
+    );
+    console.log("uploadedPhoto", uploadedPhoto);
+    const photoUrl = uploadedPhoto.url;
+    const photoPublicId = uploadedPhoto.public_id;
     await setDoc(visitRef, {
       userId: currentUser.uid,
       userName: profile.name || currentUser.email,
@@ -428,7 +426,8 @@ $('visitForm').addEventListener('submit', async e => {
       dealerLng: dealer.lng,
       notes: $('visitNotes').value.trim(),
       photoUrl,
-      photoPath,
+      photoPublicId: photoPublicId,
+      photoStorage: 'cloudinary',
       employeeLat: pos.latitude,
       employeeLng: pos.longitude,
       accuracyMeters: pos.accuracy || null,
@@ -448,6 +447,30 @@ $('visitForm').addEventListener('submit', async e => {
     setLoading(btn, false)
   }
 });
+
+
+async function uploadToCloudinary(file, userId, visitId) {
+  const CLOUDINARY_CLOUD_NAME = "o0eicmjo";
+  const CLOUDINARY_UPLOAD_PRESET = "debasish";
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("folder", `fieldops/visit-photos/${userId}`);
+  formData.append("public_id", visitId + "_" + Date.now());
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+  console.log("Cloudinary response", response);
+  // console.log("Cloudinary response status", response.json());
+  const result = await response.json();
+  return result
+}
 $('refreshVisits').addEventListener('click', loadVisits);
 async function loadVisits() {
   if (!currentUser) return;

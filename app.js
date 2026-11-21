@@ -467,7 +467,7 @@ $('visitForm').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = $('submitVisitBtn');
   const dealer = dealers.find(d => d.id === $('visitDealer').value),
-  file = capturedPhotoFile;
+    file = capturedPhotoFile;
   if (!dealer || !file) {
     toast('Select a dealer and take a photo first.', true);
     return
@@ -655,5 +655,102 @@ function updateClock() {
   $('liveClock').textContent = now.toLocaleTimeString();
   $('clockDate').textContent = dateLabel(now)
 }
+
+
+async function loadNearbyDealers() {
+  const list = $('nearbyDealerList');
+  const status = $('nearbyDealerStatus');
+  const button = $('refreshNearbyDealers');
+
+  button.disabled = true;
+  status.textContent = 'Getting your current location...';
+  list.replaceChildren();
+
+  try {
+    // Get employee's current GPS location
+    const position = await getPosition();
+
+    // Keep the current location available to the rest of the app
+    currentPosition = position;
+
+    // Calculate distances and keep dealers within 50 km
+    const nearby = dealers
+      .filter(dealer =>
+        Number.isFinite(Number(dealer.lat)) &&
+        Number.isFinite(Number(dealer.lng))
+      )
+      .map(dealer => ({
+        ...dealer,
+        distance: distanceKm(position, dealer)
+      }))
+      .filter(dealer =>
+        Number.isFinite(dealer.distance) &&
+        dealer.distance <= 50
+      )
+      .sort((a, b) => a.distance - b.distance);
+
+    if (nearby.length === 0) {
+      status.textContent = 'No dealers found within 50 km.';
+      return;
+    }
+
+    status.textContent =
+      `${nearby.length} dealer(s) found within 50 km.`;
+
+    nearby.forEach(dealer => {
+      const card = document.createElement('div');
+      card.className = 'nearby-dealer-item';
+
+      const details = document.createElement('div');
+
+      const name = document.createElement('strong');
+      name.textContent = dealer.name || 'Unnamed dealer';
+
+      const address = document.createElement('p');
+      address.className = 'muted';
+      address.textContent = dealer.address || 'No address available';
+
+      const distance = document.createElement('span');
+      distance.className = 'nearby-distance';
+      distance.textContent = `${dealer.distance.toFixed(2)} km away`;
+
+      details.append(name, address);
+      card.append(details, distance);
+
+      const selectButton = document.createElement('button');
+      selectButton.type = 'button';
+      selectButton.className = 'secondary';
+      selectButton.textContent = 'Select dealer';
+
+      selectButton.addEventListener('click', () => {
+        $('visitDealer').value = dealer.id;
+        $('visitDealer').dispatchEvent(
+          new Event('change', { bubbles: true })
+        );
+
+        $('visitDealer').scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      });
+
+      card.append(selectButton);
+      list.append(card);
+    });
+
+  } catch (error) {
+    console.error('Nearby dealer error:', error);
+    status.textContent =
+      error.message || 'Unable to find nearby dealers. Check location permission.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+$('refreshNearbyDealers').addEventListener(
+  'click',
+  loadNearbyDealers
+);
+
 updateClock();
 setInterval(updateClock, 1000);
